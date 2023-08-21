@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:todo_list_2023/home/home_page.dart';
+import 'package:todo_list_2023/widget/custom_switcher_widget.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -35,6 +36,16 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text(
+          'Todo list',
+          style: TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.w600,
+            color: Colors.deepPurple,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        centerTitle: true,
         actions: const [
           CustomSwitcher(),
         ],
@@ -42,21 +53,12 @@ class _LoginState extends State<Login> {
       body: Container(
         alignment: Alignment.center,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(30.0),
+          padding: const EdgeInsets.only(
+            left: 30,
+            right: 30,
+          ),
           child: Column(
             children: [
-              const SizedBox(
-                child: Text(
-                  'To-do list',
-                  style: TextStyle(
-                    fontFamily: 'RobotoMono',
-                    fontSize: 35,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.deepPurple,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
               SizedBox(
                 height: 300,
                 child: Image.asset('assets/images/login_page_image.png'),
