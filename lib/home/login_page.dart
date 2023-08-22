@@ -41,7 +41,7 @@ class _LoginState extends State<Login> {
           style: TextStyle(
             fontSize: 30,
             fontWeight: FontWeight.w600,
-            color: Colors.deepPurple,
+            color: Colors.indigoAccent,
           ),
           textAlign: TextAlign.center,
         ),
@@ -128,8 +128,8 @@ class _LoginState extends State<Login> {
                       end: Alignment.bottomRight,
                       stops: [0.3, 1],
                       colors: [
+                        Colors.indigo,
                         Colors.purple,
-                        Colors.deepPurple,
                       ],
                     ),
                     borderRadius: BorderRadius.all(

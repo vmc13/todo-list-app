@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:todo_list_2023/home/add_todo.dart';
+import 'package:todo_list_2023/widget/todo_card_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,167 +14,130 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-      ),
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 5),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Create",
-                  style: TextStyle(
-                    fontSize: 30,
+        title: const Text(
+          "Today's Schedule",
+          style: TextStyle(
+            fontSize: 25,
+            fontFamily: 'RobotoMono',
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: const [
+          SizedBox(
+            height: 50,
+            child: CircleAvatar(
+              backgroundImage:
+                  AssetImage("assets/images/home_profile_avatar.png"),
+            ),
+          ),
+          SizedBox(width: 25),
+        ],
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(35),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: EdgeInsets.only(left: 75),
+              child: Text(
+                "Thursday 22",
+                style: TextStyle(
+                    fontSize: 25,
                     fontFamily: 'RobotoMono',
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Text(
-                  "New To-Do",
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontFamily: 'RobotoMono',
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 25),
-                label("Task title"),
-                const SizedBox(height: 12),
-                titleTask(),
-                const SizedBox(height: 30),
-                label("Task type"),
-                const SizedBox(height: 12),
-                Wrap(
-                  runSpacing: 15,
-                  children: [
-                    chipData("Important", 0xFFE4572E),
-                    const SizedBox(width: 20),
-                    chipData("Planned", 0xFF7CDEDC),
-                    const SizedBox(width: 20),
-                    chipData("My day", 0xFFDE89BE),
-                  ],
-                ),
-                const SizedBox(height: 25),
-                label("Description"),
-                const SizedBox(height: 12),
-                inputDescription(),
-                const SizedBox(height: 50),
-                buttonCreateTodo(),
-              ],
+                    fontWeight: FontWeight.bold),
+              ),
             ),
           ),
         ),
       ),
-    );
-  }
-
-  // Widgets
-
-  Widget buttonCreateTodo() {
-    return Container(
-      height: 56,
-      width: MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: const LinearGradient(
-          colors: [
-            Color(0xFF9C27B0),
-            Color.fromARGB(255, 124, 17, 143),
-          ],
+      bottomNavigationBar: BottomNavigationBar(items: [
+        const BottomNavigationBarItem(
+          icon: Icon(
+            Icons.home,
+            size: 30,
+          ),
+          label: '',
         ),
-      ),
-      child: const Center(
-        child: Text(
-          "Add To-Do",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            fontFamily: 'RobotoMono',
+        BottomNavigationBarItem(
+          icon: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (builder) => const AddToDo(),
+                ),
+              );
+            },
+            child: Container(
+              height: 52,
+              width: 52,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.indigoAccent,
+                    Colors.purple,
+                  ],
+                ),
+              ),
+              child: const Icon(
+                Icons.add,
+                size: 32,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          label: '',
+        ),
+        const BottomNavigationBarItem(
+          icon: Icon(
+            Icons.settings,
+            size: 30,
+          ),
+          label: '',
+        ),
+      ]),
+      body: SingleChildScrollView(
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: const Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 20,
+            ),
+            child: Column(
+              children: [
+                TodoCard(
+                  title: "Wake up",
+                  iconData: Icons.alarm,
+                  iconColor: Colors.red,
+                  time: "7 AM",
+                  check: true,
+                  iconBgColor: Colors.white,
+                ),
+                SizedBox(height: 10),
+                TodoCard(
+                  title: "Go to the gym",
+                  iconData: Icons.run_circle_outlined,
+                  iconColor: Colors.green,
+                  time: "8 AM",
+                  check: true,
+                  iconBgColor: Colors.white,
+                ),
+                SizedBox(height: 10),
+                TodoCard(
+                  title: "Buy food",
+                  iconData: Icons.local_grocery_store,
+                  iconColor: Colors.orange,
+                  time: "9 AM",
+                  check: true,
+                  iconBgColor: Colors.white,
+                ),
+                SizedBox(height: 10),
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget inputDescription() {
-    return Container(
-      height: 150,
-      width: MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(
-        color: Colors.black12,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: TextFormField(
-        style: const TextStyle(
-          color: Colors.black45,
-          fontSize: 17,
-        ),
-        maxLines: null,
-        expands: true,
-        decoration: const InputDecoration(
-          border: InputBorder.none,
-          hintText: "Description",
-          hintStyle: TextStyle(color: Colors.black45, fontSize: 17),
-          contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 10),
-        ),
-      ),
-    );
-  }
-
-  Widget chipData(String label, int color) {
-    return Chip(
-      backgroundColor: Color(color),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      // elevation: 5,
-      // shadowColor: Colors.amber,
-      label: Text(
-        label,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      labelPadding: const EdgeInsets.symmetric(horizontal: 17, vertical: 3.8),
-    );
-  }
-
-  Widget titleTask() {
-    return Container(
-      height: 55,
-      width: MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(
-        color: Colors.black12,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: TextFormField(
-        style: const TextStyle(
-          color: Colors.black45,
-          fontSize: 17,
-        ),
-        decoration: const InputDecoration(
-          border: InputBorder.none,
-          hintText: "Task Title",
-          hintStyle: TextStyle(color: Colors.black45, fontSize: 17),
-          contentPadding: EdgeInsets.only(left: 20, right: 20),
-        ),
-      ),
-    );
-  }
-
-  Widget label(String label) {
-    return Text(
-      label,
-      style: const TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 18,
-        fontFamily: 'RobotoMono',
       ),
     );
   }

@@ -28,6 +28,7 @@ flutter:
 
   assets:
     - assets/images/login_page_image.png
+    - assets/images/home_profile_avatar.png
 
   fonts:
     - family: RobotoMono
