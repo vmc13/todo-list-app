@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_list_2023/home/add_todo.dart';
 import 'package:todo_list_2023/widget/todo_card_widget.dart';
@@ -10,6 +11,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final Stream<QuerySnapshot> _stream =
+      FirebaseFirestore.instance.collection("todo").snapshots();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,6 +45,7 @@ class _HomePageState extends State<HomePage> {
               child: Text(
                 "Thursday 22",
                 style: TextStyle(
+                    color: Colors.deepPurpleAccent,
                     fontSize: 25,
                     fontFamily: 'RobotoMono',
                     fontWeight: FontWeight.bold),
@@ -96,49 +101,77 @@ class _HomePageState extends State<HomePage> {
           label: '',
         ),
       ]),
-      body: SingleChildScrollView(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: const Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 20,
-            ),
-            child: Column(
-              children: [
-                TodoCard(
-                  title: "Wake up",
-                  iconData: Icons.alarm,
-                  iconColor: Colors.red,
-                  time: "7 AM",
-                  check: true,
-                  iconBgColor: Colors.white,
-                ),
-                SizedBox(height: 10),
-                TodoCard(
-                  title: "Go to the gym",
-                  iconData: Icons.run_circle_outlined,
-                  iconColor: Colors.green,
-                  time: "8 AM",
-                  check: true,
-                  iconBgColor: Colors.white,
-                ),
-                SizedBox(height: 10),
-                TodoCard(
-                  title: "Buy food",
-                  iconData: Icons.local_grocery_store,
-                  iconColor: Colors.orange,
-                  time: "9 AM",
-                  check: true,
-                  iconBgColor: Colors.white,
-                ),
-                SizedBox(height: 10),
-              ],
-            ),
-          ),
-        ),
+      body: StreamBuilder(
+        stream: _stream,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          return ListView.builder(
+            itemCount: snapshot.data?.docs.length,
+            itemBuilder: (context, index) {
+              late IconData iconData;
+              late Color iconColor;
+              Map<String, dynamic> document = snapshot.data?.docs[index].data() as Map<String, dynamic>;
+
+              switch (document["category"]) {
+                case "Work":
+                iconData = Icons.work;
+                iconColor = const Color(0xFFbda372);
+                break;
+                case "Studies":
+                iconData = Icons.menu_book_rounded;
+                iconColor = const Color(0xFF5e363f);
+                break;
+                case "Leizure":
+                iconData = Icons.beach_access_rounded;
+                iconColor = const Color(0xFFE4572E);
+                break;
+                case "Health":
+                iconData = Icons.local_hospital_rounded;
+                iconColor = const Color(0xFF93ba85);
+                break;
+                case "Family":
+                iconData = Icons.family_restroom;
+                iconColor = const Color(0xFFf05d77);
+                break;
+                case "Essential":
+                iconData = Icons.family_restroom;
+                iconColor = const Color(0xFF78c0a8);
+                break;
+                default:
+                iconData = Icons.question_mark_rounded;
+                iconColor = const Color(0xFF93ba85);
+              }
+              return TodoCard(
+                title: document["title"],
+                iconData: iconData,
+                iconColor: iconColor,
+                check: true,
+                iconBgColor: Colors.white,
+                time: "7 AM",
+              );
+            },
+          );
+        },
       ),
     );
   }
 }
+
+// child: SizedBox(
+//           height: MediaQuery.of(context).size.height,
+//           width: MediaQuery.of(context).size.width,
+//           child: const Padding(
+//             padding: EdgeInsets.symmetric(
+//               horizontal: 20,
+//               vertical: 20,
+//             ),
+//             child: Column(
+//               children: [
+//               ],
+//             ),
+//           ),
+//         ),

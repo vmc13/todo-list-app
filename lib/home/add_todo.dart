@@ -9,14 +9,16 @@ class AddToDo extends StatefulWidget {
 }
 
 class _AddToDoState extends State<AddToDo> {
+  // final Stream<QuerySnapshot> _stream =
+  //     FirebaseFirestore.instance.collection("todo").snapshots();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   String type = "";
+  String category = "";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
@@ -26,10 +28,11 @@ class _AddToDoState extends State<AddToDo> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const SizedBox(height: 50),
                 const Text(
                   "Create",
                   style: TextStyle(
-                    fontSize: 30,
+                    fontSize: 28,
                     fontFamily: 'RobotoMono',
                     fontWeight: FontWeight.bold,
                   ),
@@ -37,33 +40,52 @@ class _AddToDoState extends State<AddToDo> {
                 const Text(
                   "New To-Do",
                   style: TextStyle(
-                    fontSize: 30,
+                    fontSize: 28,
                     fontFamily: 'RobotoMono',
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 25),
+                const SizedBox(height: 15),
                 label("Task title"),
                 const SizedBox(height: 12),
                 titleTask(),
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
                 label("Task type"),
                 const SizedBox(height: 12),
                 Wrap(
                   runSpacing: 15,
                   children: [
-                    taskSelect("Important", 0xFFE4572E),
-                    const SizedBox(width: 20),
-                    taskSelect("Planned", 0xFF7CDEDC),
-                    const SizedBox(width: 20),
-                    taskSelect("My day", 0xFFDE89BE),
+                    taskSelect("Important", 0xFFff494b),
+                    const SizedBox(width: 10),
+                    taskSelect("Planned", 0xFF62997a),
+                    const SizedBox(width: 10),
+                    taskSelect("My day", 0xFFf0a830),
                   ],
                 ),
-                const SizedBox(height: 25),
+                const SizedBox(height: 20),
                 label("Description"),
                 const SizedBox(height: 12),
                 description(),
-                const SizedBox(height: 50),
+                const SizedBox(height: 20),
+                label("Task category"),
+                const SizedBox(height: 12),
+                Wrap(
+                  runSpacing: 10,
+                  children: [
+                    categorySelect("Work", 0xFFbda372),
+                    const SizedBox(width: 10),
+                    categorySelect("Studies", 0xFF5e363f),
+                    const SizedBox(width: 10),
+                    categorySelect("Leizure", 0xFFE4572E),
+                    const SizedBox(width: 10),
+                    categorySelect("Health", 0xFF93ba85),
+                    const SizedBox(width: 10),
+                    categorySelect("Family", 0xFFf05d77),
+                    const SizedBox(width: 10),
+                    categorySelect("Essential", 0xFF78c0a8),
+                  ],
+                ),
+                const SizedBox(height: 30),
                 buttonCreateTodo(),
               ],
             ),
@@ -77,19 +99,8 @@ class _AddToDoState extends State<AddToDo> {
 
   Widget buttonCreateTodo() {
     return InkWell(
-      onTap: () async {
-        await FirebaseFirestore.instance.collection("todo").add({
-          "title": _titleController.text,
-          "task": type,
-          "Description": _descriptionController.text
-        });
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar( const SnackBar(
-          content: Text('Task added successfully!'),
-          backgroundColor: Colors.green,
-        ));
-        // ignore: use_build_context_synchronously
-        Navigator.pop(context);
+      onTap: () {
+        uploadTask();
       },
       child: Container(
         height: 56,
@@ -98,18 +109,18 @@ class _AddToDoState extends State<AddToDo> {
           borderRadius: BorderRadius.circular(20),
           gradient: const LinearGradient(
             colors: [
-              Color(0xFF9C27B0),
-              Color.fromARGB(255, 124, 17, 143),
+              Colors.deepPurple,
+              Colors.indigoAccent,
             ],
           ),
         ),
         child: const Center(
           child: Text(
-            "Add To-Do",
+            "Add to-do",
             style: TextStyle(
               color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
               fontFamily: 'RobotoMono',
             ),
           ),
@@ -120,7 +131,7 @@ class _AddToDoState extends State<AddToDo> {
 
   Widget description() {
     return Container(
-      height: 150,
+      height: 140,
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
         color: Colors.black12,
@@ -169,6 +180,31 @@ class _AddToDoState extends State<AddToDo> {
     );
   }
 
+  Widget categorySelect(String label, int color) {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          category = label;
+        });
+      },
+      child: Chip(
+        backgroundColor: category == label ? Colors.indigoAccent : Color(color),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        label: Text(
+          label,
+          style: TextStyle(
+            color: category == label ? Colors.black : Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        labelPadding: const EdgeInsets.symmetric(horizontal: 17, vertical: 3.8),
+      ),
+    );
+  }
+
   Widget titleTask() {
     return Container(
       height: 55,
@@ -202,5 +238,21 @@ class _AddToDoState extends State<AddToDo> {
         fontFamily: 'RobotoMono',
       ),
     );
+  }
+
+  uploadTask() async {
+    await FirebaseFirestore.instance.collection("todo").add({
+          "title": _titleController.text,
+          "task": type,
+          "description": _descriptionController.text,
+          "category": category
+        });
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar( const SnackBar(
+          content: Text('Task added successfully!'),
+          backgroundColor: Colors.green,
+        ));
+        // ignore: use_build_context_synchronously
+        Navigator.pop(context);
   }
 }
