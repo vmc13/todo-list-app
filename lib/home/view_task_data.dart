@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class AddToDo extends StatefulWidget {
-  const AddToDo({super.key});
+class ViewTaskData extends StatefulWidget {
+  const ViewTaskData({super.key});
 
   @override
-  State<AddToDo> createState() => _AddToDoState();
+  State<ViewTaskData> createState() => _ViewTaskDataState();
 }
 
-class _AddToDoState extends State<AddToDo> {
+class _ViewTaskDataState extends State<ViewTaskData> {
   // final Stream<QuerySnapshot> _stream =
   //     FirebaseFirestore.instance.collection("todo").snapshots();
   final TextEditingController _titleController = TextEditingController();
@@ -85,9 +85,8 @@ class _AddToDoState extends State<AddToDo> {
                     categorySelect("Essential", 0xFF78c0a8),
                   ],
                 ),
-                const SizedBox(height: 40),
-                buttonCreateTodo(),
                 const SizedBox(height: 30),
+                buttonCreateTodo(),
               ],
             ),
           ),
