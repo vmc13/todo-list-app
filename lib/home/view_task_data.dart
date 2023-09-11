@@ -2,19 +2,32 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ViewTaskData extends StatefulWidget {
-  const ViewTaskData({super.key});
+  const ViewTaskData({super.key, required this.document, required this.id});
+
+  final Map<String, dynamic> document;
+  final String id;
 
   @override
   State<ViewTaskData> createState() => _ViewTaskDataState();
 }
 
 class _ViewTaskDataState extends State<ViewTaskData> {
-  // final Stream<QuerySnapshot> _stream =
-  //     FirebaseFirestore.instance.collection("todo").snapshots();
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  String type = "";
-  String category = "";
+  late TextEditingController _titleController;
+  late TextEditingController _descriptionController;
+  late String type;
+  late String category;
+  bool edit = false;
+
+  @override
+  void initState() {
+    super.initState();
+    String title = widget.document['title'] ?? "Hey there";
+    _titleController = TextEditingController(text: title);
+    _descriptionController =
+        TextEditingController(text: widget.document['description']);
+    type = widget.document['task'];
+    category = widget.document['category'];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,17 +41,45 @@ class _ViewTaskDataState extends State<ViewTaskData> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 50),
-                const Text(
-                  "Create",
-                  style: TextStyle(
+                const SizedBox(height: 40),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        color: Colors.deepPurple,
+                        size: 28,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          edit = !edit;
+                        });
+                      },
+                      icon: Icon(
+                        Icons.edit,
+                        color: edit ? Colors.green : Colors.deepPurple,
+                        size: 28,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  edit ? "Editing" : "View",
+                  style: const TextStyle(
                     fontSize: 28,
                     fontFamily: 'RobotoMono',
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const Text(
-                  "New To-Do",
+                  "Tour To-Do",
                   style: TextStyle(
                     fontSize: 28,
                     fontFamily: 'RobotoMono',
@@ -53,13 +94,13 @@ class _ViewTaskDataState extends State<ViewTaskData> {
                 label("Task type"),
                 const SizedBox(height: 12),
                 Wrap(
-                  runSpacing: 15,
+                  runSpacing: 10,
                   children: [
-                    taskSelect("Important", 0xFFff494b),
+                    taskSelect("Important", edit ? 0xFFff494b : 0xFF9E9E9E),
                     const SizedBox(width: 10),
-                    taskSelect("Planned", 0xFF62997a),
+                    taskSelect("Planned", edit ? 0xFF62997a : 0xFF9E9E9E),
                     const SizedBox(width: 10),
-                    taskSelect("My day", 0xFFf0a830),
+                    taskSelect("My day", edit ? 0xFFf0a830 : 0xFF9E9E9E),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -72,21 +113,22 @@ class _ViewTaskDataState extends State<ViewTaskData> {
                 Wrap(
                   runSpacing: 10,
                   children: [
-                    categorySelect("Work", 0xFFbda372),
+                    categorySelect("Work", edit ? 0xFFbda372 : 0xFF9E9E9E),
                     const SizedBox(width: 10),
-                    categorySelect("Studies", 0xFF5e363f),
+                    categorySelect("Studies", edit ? 0xFF5e363f : 0xFF9E9E9E),
                     const SizedBox(width: 10),
-                    categorySelect("Leizure", 0xFFE4572E),
+                    categorySelect("Leizure", edit ? 0xFFE4572E : 0xFF9E9E9E),
                     const SizedBox(width: 10),
-                    categorySelect("Health", 0xFF93ba85),
+                    categorySelect("Health", edit ? 0xFF93ba85 : 0xFF9E9E9E),
                     const SizedBox(width: 10),
-                    categorySelect("Family", 0xFFf05d77),
+                    categorySelect("Family", edit ? 0xFFf05d77 : 0xFF9E9E9E),
                     const SizedBox(width: 10),
-                    categorySelect("Essential", 0xFF78c0a8),
+                    categorySelect("Essential", edit ? 0xFF78c0a8 : 0xFF9E9E9E),
                   ],
                 ),
+                const SizedBox(height: 40),
+                edit ? buttonCreateTodo() : Container(),
                 const SizedBox(height: 30),
-                buttonCreateTodo(),
               ],
             ),
           ),
@@ -116,7 +158,7 @@ class _ViewTaskDataState extends State<ViewTaskData> {
         ),
         child: const Center(
           child: Text(
-            "Add to-do",
+            "Update to-do",
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -139,8 +181,8 @@ class _ViewTaskDataState extends State<ViewTaskData> {
       ),
       child: TextFormField(
         controller: _descriptionController,
-        style: const TextStyle(
-          color: Colors.black45,
+        style: TextStyle(
+          color: edit ? Colors.black54 : Colors.black,
           fontSize: 17,
         ),
         maxLines: null,
@@ -157,11 +199,13 @@ class _ViewTaskDataState extends State<ViewTaskData> {
 
   Widget taskSelect(String label, int color) {
     return InkWell(
-      onTap: () {
-        setState(() {
-          type = label;
-        });
-      },
+      onTap: edit
+          ? () {
+              setState(() {
+                type = label;
+              });
+            }
+          : null,
       child: Chip(
         backgroundColor: type == label ? Colors.indigoAccent : Color(color),
         shape: RoundedRectangleBorder(
@@ -182,11 +226,13 @@ class _ViewTaskDataState extends State<ViewTaskData> {
 
   Widget categorySelect(String label, int color) {
     return InkWell(
-      onTap: () {
-        setState(() {
-          category = label;
-        });
-      },
+      onTap: edit
+          ? () {
+              setState(() {
+                category = label;
+              });
+            }
+          : null,
       child: Chip(
         backgroundColor: category == label ? Colors.indigoAccent : Color(color),
         shape: RoundedRectangleBorder(
@@ -215,8 +261,9 @@ class _ViewTaskDataState extends State<ViewTaskData> {
       ),
       child: TextFormField(
         controller: _titleController,
-        style: const TextStyle(
-          color: Colors.black45,
+        enabled: edit,
+        style: TextStyle(
+          color: edit ? Colors.black54 : Colors.black,
           fontSize: 17,
         ),
         decoration: const InputDecoration(
@@ -241,18 +288,18 @@ class _ViewTaskDataState extends State<ViewTaskData> {
   }
 
   uploadTask() async {
-    await FirebaseFirestore.instance.collection("todo").add({
-          "title": _titleController.text,
-          "task": type,
-          "description": _descriptionController.text,
-          "category": category
-        });
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar( const SnackBar(
-          content: Text('Task added successfully!'),
-          backgroundColor: Colors.green,
-        ));
-        // ignore: use_build_context_synchronously
-        Navigator.pop(context);
+    await FirebaseFirestore.instance.collection("todo").doc(widget.id).update({
+      "title": _titleController.text,
+      "task": type,
+      "description": _descriptionController.text,
+      "category": category
+    });
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text('Task uploaded successfully!'),
+      backgroundColor: Colors.green,
+    ));
+    // ignore: use_build_context_synchronously
+    Navigator.pop(context);
   }
 }

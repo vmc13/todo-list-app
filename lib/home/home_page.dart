@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_list_2023/home/add_todo.dart';
+import 'package:todo_list_2023/home/view_task_data.dart';
 import 'package:todo_list_2023/widget/todo_card_widget.dart';
 
 class HomePage extends StatefulWidget {
@@ -114,44 +115,58 @@ class _HomePageState extends State<HomePage> {
             itemBuilder: (context, index) {
               late IconData iconData;
               late Color iconColor;
-              Map<String, dynamic> document = snapshot.data?.docs[index].data() as Map<String, dynamic>;
+              Map<String, dynamic> document =
+                  snapshot.data?.docs[index].data() as Map<String, dynamic>;
 
               switch (document["category"]) {
                 case "Work":
-                iconData = Icons.work;
-                iconColor = const Color(0xFFbda372);
-                break;
+                  iconData = Icons.work;
+                  iconColor = const Color(0xFFbda372);
+                  break;
                 case "Studies":
-                iconData = Icons.menu_book_rounded;
-                iconColor = const Color(0xFF5e363f);
-                break;
+                  iconData = Icons.menu_book_rounded;
+                  iconColor = const Color(0xFF5e363f);
+                  break;
                 case "Leizure":
-                iconData = Icons.beach_access_rounded;
-                iconColor = const Color(0xFFE4572E);
-                break;
+                  iconData = Icons.beach_access_rounded;
+                  iconColor = const Color(0xFFE4572E);
+                  break;
                 case "Health":
-                iconData = Icons.local_hospital_rounded;
-                iconColor = const Color(0xFF93ba85);
-                break;
+                  iconData = Icons.local_hospital_rounded;
+                  iconColor = const Color(0xFF93ba85);
+                  break;
                 case "Family":
-                iconData = Icons.family_restroom;
-                iconColor = const Color(0xFFf05d77);
-                break;
+                  iconData = Icons.family_restroom;
+                  iconColor = const Color(0xFFf05d77);
+                  break;
                 case "Essential":
-                iconData = Icons.family_restroom;
-                iconColor = const Color(0xFF78c0a8);
-                break;
+                  iconData = Icons.home;
+                  iconColor = const Color(0xFF78c0a8);
+                  break;
                 default:
-                iconData = Icons.question_mark_rounded;
-                iconColor = const Color(0xFF93ba85);
+                  iconData = Icons.question_mark_rounded;
+                  iconColor = const Color(0xFF93ba85);
               }
-              return TodoCard(
-                title: document["title"],
-                iconData: iconData,
-                iconColor: iconColor,
-                check: true,
-                iconBgColor: Colors.white,
-                time: "7 AM",
+              return InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (builder) => ViewTaskData(
+                        document: document,
+                        id: snapshot.data!.docs[index].id,
+                      ),
+                    ),
+                  );
+                },
+                child: TodoCard(
+                  title: document["title"],
+                  iconData: iconData,
+                  iconColor: iconColor,
+                  check: true,
+                  iconBgColor: Colors.white,
+                  time: "7 AM",
+                ),
               );
             },
           );
