@@ -55,17 +55,37 @@ class _ViewTaskDataState extends State<ViewTaskData> {
                         size: 28,
                       ),
                     ),
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          edit = !edit;
-                        });
-                      },
-                      icon: Icon(
-                        Icons.edit,
-                        color: edit ? Colors.green : Colors.deepPurple,
-                        size: 28,
-                      ),
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: () async {
+                            await FirebaseFirestore.instance
+                                .collection("todo")
+                                .doc(widget.id)
+                                .delete()
+                                .then((value) => {
+                                  Navigator.pop(context)
+                                });
+                          },
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.deepPurple,
+                            size: 28,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              edit = !edit;
+                            });
+                          },
+                          icon: Icon(
+                            Icons.edit,
+                            color: edit ? Colors.green : Colors.deepPurple,
+                            size: 28,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -181,6 +201,7 @@ class _ViewTaskDataState extends State<ViewTaskData> {
       ),
       child: TextFormField(
         controller: _descriptionController,
+        enabled: edit,
         style: TextStyle(
           color: edit ? Colors.black54 : Colors.black,
           fontSize: 17,

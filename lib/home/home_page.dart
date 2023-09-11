@@ -4,6 +4,8 @@ import 'package:todo_list_2023/home/add_todo.dart';
 import 'package:todo_list_2023/home/view_task_data.dart';
 import 'package:todo_list_2023/widget/todo_card_widget.dart';
 
+import '../Models/select.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -14,18 +16,25 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final Stream<QuerySnapshot> _stream =
       FirebaseFirestore.instance.collection("todo").snapshots();
+  List<Select> selected = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Today's Schedule",
-          style: TextStyle(
-            fontSize: 25,
-            fontFamily: 'RobotoMono',
-            fontWeight: FontWeight.bold,
-          ),
+        title: const Row(
+          children: [
+            Icon(Icons.arrow_back),
+            SizedBox(width: 10),
+            Text(
+              "Today's Schedule",
+              style: TextStyle(
+                fontSize: 25,
+                fontFamily: 'RobotoMono',
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
         actions: const [
           SizedBox(
@@ -37,19 +46,43 @@ class _HomePageState extends State<HomePage> {
           ),
           SizedBox(width: 25),
         ],
-        bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(35),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(35),
           child: Align(
             alignment: Alignment.centerLeft,
             child: Padding(
-              padding: EdgeInsets.only(left: 75),
-              child: Text(
-                "Thursday 22",
-                style: TextStyle(
-                    color: Colors.deepPurpleAccent,
-                    fontSize: 25,
-                    fontFamily: 'RobotoMono',
-                    fontWeight: FontWeight.bold),
+              padding: const EdgeInsets.only(
+                left: 50,
+                right: 25,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Thursday 22",
+                    style: TextStyle(
+                        color: Colors.deepPurpleAccent,
+                        fontSize: 25,
+                        fontFamily: 'RobotoMono',
+                        fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.delete,
+                      color: Colors.deepPurple,
+                      size: 28,
+                    ),
+                    onPressed: () {
+                      var instance =
+                          FirebaseFirestore.instance.collection("todo");
+                      for (var i = 0; i < selected.length; i++) {
+                        if (selected[i].checkValue) {
+                          instance.doc(selected[i].id).delete();
+                        }
+                      }
+                    },
+                  ),
+                ],
               ),
             ),
           ),
@@ -147,6 +180,8 @@ class _HomePageState extends State<HomePage> {
                   iconData = Icons.question_mark_rounded;
                   iconColor = const Color(0xFF93ba85);
               }
+              selected.add(
+                  Select(id: snapshot.data!.docs[index].id, checkValue: false));
               return InkWell(
                 onTap: () {
                   Navigator.push(
@@ -163,9 +198,11 @@ class _HomePageState extends State<HomePage> {
                   title: document["title"],
                   iconData: iconData,
                   iconColor: iconColor,
-                  check: true,
+                  check: selected[index].checkValue,
                   iconBgColor: Colors.white,
                   time: "7 AM",
+                  onChange: onChange,
+                  index: index,
                 ),
               );
             },
@@ -174,19 +211,10 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
 
-// child: SizedBox(
-//           height: MediaQuery.of(context).size.height,
-//           width: MediaQuery.of(context).size.width,
-//           child: const Padding(
-//             padding: EdgeInsets.symmetric(
-//               horizontal: 20,
-//               vertical: 20,
-//             ),
-//             child: Column(
-//               children: [
-//               ],
-//             ),
-//           ),
-//         ),
+  void onChange(int index) {
+    setState(() {
+      selected[index].checkValue = !selected[index].checkValue;
+    });
+  }
+}
